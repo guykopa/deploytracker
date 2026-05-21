@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: deploytracker
+  labels:
+    {{- include "deploytracker.postgresLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "deploytracker.postgresSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: postgres

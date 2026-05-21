@@ -1,0 +1,118 @@
+prometheus:
+  server:
+    nodeSelector:
+      role: app
+    persistentVolume:
+      size: 8Gi
+      storageClass: local-path
+    retention: "7d"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    extraFlags:
+      - web.enable-remote-write-receiver
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+
+loki:
+  deploymentMode: SingleBinary
+  singleBinary:
+    replicas: 1
+    nodeSelector:
+      role: app
+    persistence:
+      size: 5Gi
+      storageClass: local-path
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
+  loki:
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+    compactor:
+      retention_enabled: true
+      delete_request_store: filesystem
+    limits_config:
+      retention_period: 168h
+
+grafana:
+  nodeSelector:
+    role: app
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: local-path
+  service:
+    type: NodePort
+    nodePort: 30030
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  adminPassword: "CHANGE_ME"
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://observability-prometheus-server.observability.svc.cluster.local
+          isDefault: true
+          access: proxy
+        - name: Loki
+          type: loki
+          url: http://observability-loki.observability.svc.cluster.local:3100
+          access: proxy
+          jsonData:
+            derivedFields:
+              - matcherRegex: '"trace_id":"(\w+)"'
+                name: TraceID
+                url: ""
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: deploytracker
+          folder: DeployTracker
+          type: file
+          options:
+            path: /var/lib/grafana/dashboards/deploytracker
+
+promtail:
+  config:
+    clients:
+      - url: http://observability-loki.observability.svc.cluster.local:3100/loki/api/v1/push

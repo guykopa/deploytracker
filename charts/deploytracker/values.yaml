@@ -1,0 +1,43 @@
+image:
+  repository: 378202225330.dkr.ecr.eu-west-3.amazonaws.com/deploytracker
+  tag: latest
+  pullPolicy: Always
+
+replicaCount: 1
+
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 30080
+
+env:
+  DEPLOYTRACKER_ENV: demo
+  DEPLOYTRACKER_LOG_LEVEL: INFO
+  DEPLOYTRACKER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
+
+postgres:
+  image: postgres:16-alpine
+  storage: 5Gi
+  storageClass: local-path
+
+resources:
+  api:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  postgres:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+nodeSelector:
+  api:
+    role: app
+  postgres:
+    role: app

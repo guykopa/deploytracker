@@ -1,0 +1,9 @@
+---
+- name: Install K3s server
+  hosts: k3s_server
+  become: true
+  tasks:
+    - name: Run K3s server tasks
+      ansible.builtin.import_role:
+        name: k3s
+        tasks_from: server

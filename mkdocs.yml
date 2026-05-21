@@ -1,0 +1,65 @@
+site_name: deploytracker
+site_description: DORA metrics tracking service — AWS, K3s, FastAPI, LGTM stack
+site_url: https://guykopa.github.io/deploytracker
+repo_url: https://github.com/guykopa/deploytracker
+repo_name: guykopa/deploytracker
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - def_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Architecture: architecture.md
+  - Authentication: authentication.md
+  - API Reference: api.md
+  - Infrastructure: infrastructure.md
+  - Development: development.md
+  - Architecture Decision Records:
+    - Overview: adr/index.md
+    - ADR-001 Hexagonal Architecture: adr/001-hexagonal-architecture.md
+    - ADR-002 LGTM vs Elastic: adr/002-lgtm-vs-elastic.md
+    - ADR-003 K3s vs EKS: adr/003-k3s-vs-eks.md
+    - ADR-004 No Tempo on Free Tier: adr/004-no-tempo-on-freetier.md
+    - ADR-005 JWT Authentication: adr/005-jwt-authentication.md
+    - ADR-006 t3.small Upgrade: adr/006-t3small-upgrade.md

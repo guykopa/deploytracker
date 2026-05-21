@@ -1,0 +1,74 @@
+---
+- name: Update and upgrade apt packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - wget
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-boto3
+    state: present
+
+- name: Create swapfile
+  command: fallocate -l 4G /swapfile
+  args:
+    creates: /swapfile
+
+- name: Set swapfile permissions
+  file:
+    path: /swapfile
+    mode: '0600'
+
+- name: Format swapfile
+  command: mkswap /swapfile
+  args:
+    creates: /swapfile
+
+- name: Enable swap
+  command: swapon /swapfile
+  register: swapon_result
+  failed_when: swapon_result.rc != 0 and 'already' not in swapon_result.stderr and 'busy' not in swapon_result.stderr
+
+- name: Persist swap in fstab
+  lineinfile:
+    path: /etc/fstab
+    line: '/swapfile none swap sw 0 0'
+    state: present
+
+- name: Disable ufw
+  command: ufw disable
+  ignore_errors: yes
+
+- name: Enable ip_forward
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_file: /etc/sysctl.conf
+    reload: yes
+    state: present
+
+- name: Load kernel modules for K3s
+  copy:
+    dest: /etc/modules-load.d/k3s.conf
+    content: |
+      br_netfilter
+      overlay
+    mode: '0644'
+
+- name: Load br_netfilter module immediately
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Load overlay module immediately
+  modprobe:
+    name: overlay
+    state: present

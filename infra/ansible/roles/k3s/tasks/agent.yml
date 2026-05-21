@@ -1,0 +1,28 @@
+---
+- name: Get K3s token from SSM
+  set_fact:
+    k3s_token: "{{ lookup('amazon.aws.aws_ssm', '/deploytracker/k3s_token', region='eu-west-3', decrypt=True) }}"
+
+- name: Get K3s server private IP
+  set_fact:
+    k3s_server_ip: "{{ hostvars[groups['k3s_server'][0]]['private_ip_address'] }}"
+
+- name: Uninstall K3s agent if already installed
+  shell: /usr/local/bin/k3s-agent-uninstall.sh
+  args:
+    removes: /usr/local/bin/k3s-agent-uninstall.sh
+
+- name: Install K3s agent
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" \
+      K3S_URL="https://{{ k3s_server_ip }}:6443" \
+      K3S_TOKEN="{{ k3s_token }}" \
+      sh -s - agent --node-label role=app
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Ensure k3s-agent service is started and enabled
+  systemd:
+    name: k3s-agent
+    state: started
+    enabled: yes

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**']
+  pull_request:
+    branches: [main]
+    paths: ['app/**']
+
+jobs:
+  quality:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache virtualenv
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: app/.venv
+          key: venv-${{ matrix.python-version }}-${{ hashFiles('app/requirements-dev.txt') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: app
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip --quiet
+          .venv/bin/pip install -r requirements-dev.txt --quiet
+          .venv/bin/pip install -e . --quiet
+
+      - name: Lint
+        working-directory: app
+        run: .venv/bin/ruff check src tests
+
+      - name: Type check
+        working-directory: app
+        run: .venv/bin/mypy src/
+
+      - name: Test
+        working-directory: app
+        run: |
+          .venv/bin/pytest tests/ \
+            --cov=deploytracker \
+            --cov-report=xml \
+            --cov-fail-under=80 \
+            -v
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.11'
+        with:
+          files: app/coverage.xml
