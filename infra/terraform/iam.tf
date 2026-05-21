@@ -41,15 +41,10 @@ data "aws_iam_policy_document" "github_actions_permissions" {
     effect = "Allow"
     actions = [
       "ecr:DescribeRepositories",
+      "ecr:DescribeImages",
       "ecr:CreateRepository",
-    ]
-    resources = ["arn:aws:ecr:eu-west-3:378202225330:repository/deploytracker"]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
       "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
       "ecr:PutImage",
       "ecr:InitiateLayerUpload",
       "ecr:UploadLayerPart",
