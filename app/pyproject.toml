@@ -13,6 +13,7 @@ uvicorn = { version = "~0.32", extras = ["standard"] }
 sqlalchemy = "~2.0"
 alembic = "~1.14"
 pydantic-settings = "~2.6"
+pyjwt = "~2.10"
 psycopg2-binary = "~2.9"
 opentelemetry-sdk = "~1.28"
 opentelemetry-api = "~1.28"
