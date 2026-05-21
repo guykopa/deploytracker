@@ -1,0 +1,6 @@
+---
+- name: Bootstrap all nodes
+  hosts: all
+  become: true
+  roles:
+    - common

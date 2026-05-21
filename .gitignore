@@ -1,0 +1,69 @@
+# SSH keys & secrets
+*.pem
+*.key
+cle-ssh.pem
+infra/terraform/terraform.tfvars
+
+# Environment files (contain secrets)
+.env
+app/.env
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/.terraform.lock.hcl
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/crash.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Poetry / virtualenv
+app/.venv/
+.venv/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# mypy
+.mypy_cache/
+
+# ruff
+.ruff_cache/
+
+# Kubernetes
+/tmp/k3s-kubeconfig.yaml
+*.kubeconfig
+
+# Helm
+charts/*/charts/
+charts/*/*.tgz
+
+# Docker
+*.tar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code (local AI assistant config — not for team)
+.claude/
+CLAUDE.md
+Architecture.md

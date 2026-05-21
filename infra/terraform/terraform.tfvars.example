@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars and fill in the values
+db_password            = "CHANGE_ME"
+grafana_admin_password = "CHANGE_ME"
+k3s_token              = "CHANGE_ME"

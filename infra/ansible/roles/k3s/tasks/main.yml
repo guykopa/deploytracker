@@ -1,0 +1,3 @@
+---
+- import_tasks: server.yml
+  when: "'k3s-server' in group_names"

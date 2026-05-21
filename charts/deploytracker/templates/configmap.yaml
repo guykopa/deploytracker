@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deploytracker-config
+  namespace: deploytracker
+  labels:
+    {{- include "deploytracker.labels" . | nindent 4 }}
+data:
+  DEPLOYTRACKER_ENV: {{ .Values.env.DEPLOYTRACKER_ENV | quote }}
+  DEPLOYTRACKER_LOG_LEVEL: {{ .Values.env.DEPLOYTRACKER_LOG_LEVEL | quote }}
+  DEPLOYTRACKER_OTLP_ENDPOINT: {{ .Values.env.DEPLOYTRACKER_OTLP_ENDPOINT | quote }}
+  DEPLOYTRACKER_DATABASE_URL: "postgresql://deploytracker:$(DEPLOYTRACKER_DB_PASSWORD)@postgres.deploytracker.svc.cluster.local:5432/deploytracker"

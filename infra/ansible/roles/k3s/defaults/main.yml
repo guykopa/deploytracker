@@ -1,0 +1,9 @@
+---
+k3s_version: "v1.31.4+k3s1"
+k3s_server_flags:
+  - "--disable traefik"
+  - "--disable servicelb"
+  - "--write-kubeconfig-mode 644"
+  - "--node-label role=control"
+k3s_agent_flags:
+  - "--node-label role=app"
