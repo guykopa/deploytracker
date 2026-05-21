@@ -65,7 +65,13 @@ def clean_tables(db_session: Session) -> Generator[None, None, None]:
 @pytest.fixture()
 async def test_client(db_engine: object) -> AsyncGenerator[AsyncClient, None]:
     # Import app after db_engine is wired so lifespan sees the engine already set
+    from deploytracker.api.auth import create_access_token
     from deploytracker.api.main import app
+    from deploytracker.infrastructure.config import Settings
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    settings = Settings()
+    token = create_access_token(settings, settings.admin_username)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", headers=headers) as client:
         yield client
