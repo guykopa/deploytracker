@@ -4,6 +4,8 @@ A DevOps performance tracking service that collects deployment events from CI/CD
 
 Built as a complete Move-to-Cloud demonstration on AWS: Terraform, Ansible, K3s, OpenTelemetry, Prometheus, Loki, Grafana, JWT authentication, and GitHub Actions.
 
+**Documentation:** https://guykopa.github.io/deploytracker/
+
 ---
 
 ## What it does
