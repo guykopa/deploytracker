@@ -8,7 +8,7 @@ ANSIBLE_DIR := infra/ansible
 SSH_KEY     := /home/kopa/deploytracker/cle-ssh.pem
 ANSIBLE     := /home/kopa/deploytracker/app/.venv/bin/ansible-playbook
 
-.PHONY: all help infra-up infra-down configure deploy-app deploy-observ deploy-all \
+.PHONY: all help infra-up infra-down infra-down-full configure deploy-app deploy-observ deploy-all \
         loadgen-start loadgen-stop grafana logs shell \
         lint test typecheck docker-build docker-push ecr-login destroy-all
 
@@ -23,7 +23,14 @@ help: ## Show this help message
 infra-up: ## Provision AWS infrastructure with Terraform
 	cd $(TF_DIR) && terraform init && terraform apply -auto-approve
 
-infra-down: ## Destroy AWS infrastructure (run before ending work session)
+infra-down: ## Destroy session resources only (EC2 + EIP) — keeps ECR, IAM, VPC alive
+	cd $(TF_DIR) && terraform destroy -auto-approve \
+		-target=aws_instance.k3s_server \
+		-target=aws_instance.k3s_agent1 \
+		-target=aws_instance.k3s_agent2 \
+		-target=aws_eip.k3s_server
+
+infra-down-full: ## Full infrastructure teardown including ECR and IAM (rare — breaks CI/CD)
 	cd $(TF_DIR) && terraform destroy -auto-approve
 
 configure: ## Configure K3s cluster with Ansible
