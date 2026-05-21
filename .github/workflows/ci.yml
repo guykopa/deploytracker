@@ -38,6 +38,7 @@ jobs:
           python -m venv .venv
           .venv/bin/pip install --upgrade pip --quiet
           .venv/bin/pip install -r requirements-dev.txt --quiet
+          .venv/bin/pip install -e . --quiet
 
       - name: Lint
         working-directory: app
