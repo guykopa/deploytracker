@@ -9,6 +9,10 @@ resource "aws_ecr_repository" "deploytracker" {
   tags = {
     Name = "deploytracker"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_ecr_lifecycle_policy" "deploytracker" {
