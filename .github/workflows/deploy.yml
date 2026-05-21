@@ -27,6 +27,15 @@ jobs:
           role-to-assume: arn:aws:iam::378202225330:role/deploytracker-github-actions
           aws-region: eu-west-3
 
+      - name: Ensure ECR repository exists
+        run: |
+          aws ecr describe-repositories --repository-names deploytracker --region eu-west-3 2>/dev/null || \
+          aws ecr create-repository \
+            --repository-name deploytracker \
+            --region eu-west-3 \
+            --image-scanning-configuration scanOnPush=true \
+            --image-tag-mutability MUTABLE
+
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
 
