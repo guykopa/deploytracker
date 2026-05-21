@@ -6,11 +6,11 @@ OBS_CHART   := charts/observability
 TF_DIR      := infra/terraform
 ANSIBLE_DIR := infra/ansible
 SSH_KEY     := /home/kopa/deploytracker/cle-ssh.pem
-ANSIBLE     := /home/kopa/deploytracker/app/.venv/bin/ansible-playbook
+ANSIBLE     := /usr/bin/ansible-playbook
 
 .PHONY: all help infra-up infra-down infra-down-full configure deploy-app deploy-observ deploy-all \
         loadgen-start loadgen-stop grafana logs shell \
-        lint test typecheck docker-build docker-push ecr-login destroy-all
+        lint test typecheck docker-build docker-push ecr-login destroy-all startup
 
 all: help
 
@@ -79,15 +79,15 @@ shell: ## Open a shell in a deploytracker pod
 # ─── Development ───────────────────────────────────────────────────────────────
 
 lint: ## Run ruff linter
-	cd $(APP_DIR) && poetry run ruff check src tests
+	cd $(APP_DIR) && .venv/bin/ruff check src tests
 
 test: ## Run tests with coverage (minimum 80%)
-	cd $(APP_DIR) && poetry run pytest tests/ \
+	cd $(APP_DIR) && .venv/bin/pytest tests/ \
 		--cov=deploytracker --cov-report=term-missing \
 		--cov-fail-under=80 -v
 
 typecheck: ## Run mypy strict type checking
-	cd $(APP_DIR) && poetry run mypy src/
+	cd $(APP_DIR) && .venv/bin/mypy src/
 
 docker-build: ## Build Docker image locally
 	docker build -t deploytracker:local $(APP_DIR)
@@ -103,7 +103,7 @@ startup: ## Full startup: infra + K3s + secrets + Helm deploy (run after make in
 
 # ─── Safety ────────────────────────────────────────────────────────────────────
 
-destroy-all: ## Full teardown (helm uninstall + terraform destroy)
+destroy-all: ## Teardown workloads + destroy EC2/EIP (keeps ECR, IAM, VPC)
 	helm uninstall deploytracker -n deploytracker --ignore-not-found
 	helm uninstall observability -n observability --ignore-not-found
 	kubectl delete namespace deploytracker --ignore-not-found

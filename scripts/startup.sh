@@ -3,7 +3,7 @@ set -euo pipefail
 
 REGION="eu-west-3"
 ECR_URL="378202225330.dkr.ecr.eu-west-3.amazonaws.com/deploytracker"
-ANSIBLE="/home/kopa/deploytracker/app/.venv/bin/ansible-playbook"
+ANSIBLE=$(which ansible-playbook)
 ANSIBLE_DIR="/home/kopa/deploytracker/infra/ansible"
 
 log() { echo "[$(date +%H:%M:%S)] $*"; }
